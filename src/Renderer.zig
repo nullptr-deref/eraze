@@ -5,15 +5,6 @@ const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 
 const Renderer = @This();
 
-const Logger = @import("Logger.zig");
-
-
-pub const SizedBuffer = struct {
-    buffer: gl.Buffer,
-    len: usize,
-    element_type: ?gl.ElementType // present only if buffer is an element buffer
-};
-
 pub const Context = struct {
     const Self = @This();
     native_handle: *glfw.GLFWwindow,
@@ -48,11 +39,17 @@ pub fn init(
     try glfwInit();
     const context = try Context.init(width, height, title);
     swapInterval(1);
+    glfw.glfwMakeContextCurrent(context.native_handle);
+    try gl.binding.load(getProcAddress);
     return Renderer{
         .context = context,
         .targets = std.ArrayList(RenderTarget).empty,
         .allocator = allocator,
     };
+}
+
+pub fn getProcAddress(pname: [:0]const u8) ?*const anyopaque {
+    return glfw.glfwGetProcAddress(pname);
 }
 
 pub fn registerTarget(self: *Renderer, tgt: RenderTarget) void {
@@ -99,9 +96,15 @@ fn glfwInit() !void {
     }
 }
 
+pub const SizedBuffer = struct {
+    buffer: gl.Buffer,
+    len: usize,
+    element_type: ?gl.ElementType // present only if buffer is an element buffer
+};
+
 /// Render target is a wrapper around vertex buffer, vertex array and
 /// shader program used to render them properly.
-const RenderTarget = struct {
+pub const RenderTarget = struct {
     program: gl.Program,
     vao: gl.VertexArray,
     vbo: SizedBuffer,
