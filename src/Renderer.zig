@@ -4,9 +4,11 @@ const gl = @import("zgl");
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 
 const Renderer = @This();
+const Logger = @import("Logger.zig");
 
 pub const Context = struct {
     const Self = @This();
+
     native_handle: *glfw.GLFWwindow,
 
     fn init(width: usize, height: usize, title: []const u8) !Context {
@@ -35,11 +37,28 @@ pub fn init(
     title: []const u8,
     allocator: std.mem.Allocator,
 ) !Renderer {
-    try glfwInit();
+    glfw.glfwWindowHint(glfw.GLFW_DECORATED, glfw.GLFW_FALSE);
+    glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MINOR, 3);
+
+    glfwInit() catch {
+        const logger = Logger.init;
+        var desc: [][:0]const u8 = undefined;
+        _ = glfw.glfwGetError(@ptrCast(&desc));
+        try logger.printError("{s}\n", .{desc});
+        std.process.exit(127);
+    };
+
     const context = try Context.init(width, height, title);
     swapInterval(1);
     glfw.glfwMakeContextCurrent(context.native_handle);
     try gl.binding.load(getProcAddress);
+
+    gl.enable(gl.Capabilities.blend);
+    gl.blendFunc(
+        gl.BlendFactor.src_alpha,
+        gl.BlendFactor.one_minus_src_alpha,
+    );
     return Renderer{
         .context = context,
         .targets = std.ArrayList(RenderTarget).init(allocator),
@@ -50,7 +69,7 @@ pub fn getProcAddress(pname: [:0]const u8) ?*const anyopaque {
     return glfw.glfwGetProcAddress(pname);
 }
 
-pub fn registerTarget(self: *Renderer, tgt: RenderTarget) void {
+pub fn registerTarget(self: *Renderer, tgt: RenderTarget) error{OutOfMemory}!void {
     try self.targets.append(tgt);
 }
 
@@ -64,7 +83,9 @@ pub fn windowShouldClose(self: Renderer) bool {
 
 pub fn renderFrame(self: *Renderer) void {
     glfw.glfwSwapBuffers(self.context.native_handle);
-    for (self.targets.items) |t| {
+    gl.clear(.{ .color = true });
+    for (self.targets.items, 0..) |t, i| {
+        std.debug.print("rendering target {}\n", .{i});
         t.vao.bind();
         t.vbo.buffer.bind(gl.BufferTarget.array_buffer);
         t.program.use();
@@ -83,6 +104,7 @@ pub fn setCurrentContext(self: *Renderer, ctx: *Context) void {
 }
 
 pub fn deinit(self: *Renderer) void {
+    self.targets.deinit();
     self.context.deinit();
     glfw.glfwTerminate();
 }
