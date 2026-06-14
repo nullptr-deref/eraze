@@ -26,12 +26,13 @@ pub fn init(width: usize,
 }
 
 pub fn deinit(self: *App) void {
+    self.renderer.deinit();
     self.running = false;
 }
 
 pub fn run(self: *App) anyerror!void {
     try self.logger.printMessage("trying to run the application", .{});
-    glfw.glfwWindowHint(glfw.GLFW_DECORATED, glfw.GLFW_FALSE);
+    glfw.glfwWindowHint(glfw.GLFW_DECORATED, glfw.GLFW_TRUE);
     glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MINOR, 3);
 

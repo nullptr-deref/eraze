@@ -37,6 +37,7 @@ pub const Context = struct {
 
 context: Context,
 targets: std.ArrayList(RenderTarget),
+allocator: std.mem.Allocator,
 
 pub fn init(
     width: usize,
@@ -49,12 +50,13 @@ pub fn init(
     swapInterval(1);
     return Renderer{
         .context = context,
-        .targets = std.ArrayList(RenderTarget).init(allocator),
+        .targets = std.ArrayList(RenderTarget).empty,
+        .allocator = allocator,
     };
 }
 
 pub fn registerTarget(self: *Renderer, tgt: RenderTarget) void {
-    try self.targets.append(tgt);
+    try self.targets.append(self.allocator, tgt);
 }
 
 fn swapInterval(interval: u32) void {
@@ -87,6 +89,7 @@ pub fn setCurrentContext(self: *Renderer, ctx: *Context) void {
 
 pub fn deinit(self: *Renderer) void {
     self.context.deinit();
+    self.targets.deinit(self.allocator);
     glfw.glfwTerminate();
 }
 
