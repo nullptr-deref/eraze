@@ -10,6 +10,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     exe_mod.linkSystemLibrary("glfw", .{});
+    exe_mod.link_libc = true;
 
     const zgl = b.dependency("zgl", .{
         .target = target,
@@ -18,10 +19,10 @@ pub fn build(b: *std.Build) void {
     exe_mod.addImport("zgl", zgl.module("zgl"));
 
     const exe = b.addExecutable(.{
-        .name = "lumines",
+        .name = "eraze",
         .root_module = exe_mod,
     });
-    exe.linkLibC();
+    exe.use_llvm = true;
 
     b.installArtifact(exe);
 

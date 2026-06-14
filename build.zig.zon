@@ -1,7 +1,7 @@
 .{
-    .name = .lumines,
+    .name = .eraze,
     .version = "0.0.0",
-    .fingerprint = 0x3ed637a6bad00ba8, // Changing this has security and trust implications.
+    .fingerprint = 0xf7dbc28b51d51cd4, // Changing this has security and trust implications.
     .minimum_zig_version = "0.14.1",
     .paths = .{
         "build.zig",
@@ -10,8 +10,8 @@
     },
     .dependencies = .{
         .zgl = .{
-            .url = "https://github.com/ziglibs/zgl/archive/caf811fb8b778184128772e57dfcb96be2351c43.tar.gz",
-            .hash = "zgl-1.1.0-p_NpAJJECgDSDHYHH_W6rX0snxnFoJ4JZZ0FV5_vqjjy",
+            .url = "https://github.com/ziglibs/zgl/archive/a73479a8036ebf806759f8dd7e6d60abc631da1d.tar.gz",
+            .hash = "zgl-1.1.0-p_NpAD9FCgAY_XDO_EXxSGJ5-n9b3deO0V-9z9HJKYTQ",
         },
     },
 }

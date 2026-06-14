@@ -11,6 +11,7 @@ pub fn main() !void {
     const allocator = gpa.allocator();
     const game_title = "lumines";
     var app = try App.init(640, 480, game_title, allocator);
+    const game_title = "eraze";
     defer app.deinit();
 
     try app.run();
