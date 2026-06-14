@@ -10,15 +10,18 @@ const EXIT_FAILURE = 127;
 
 running: bool,
 renderer: Renderer,
+logger: Logger,
 
 pub fn init(width: usize,
     height: usize,
     title: []const u8,
+    io: std.Io,
     allocator: std.mem.Allocator,
 ) !App {
     return App{
         .running = true,
         .renderer = try Renderer.init(width, height, title, allocator),
+        .logger = .{ .io = io },
     };
 }
 
@@ -27,12 +30,14 @@ pub fn deinit(self: *App) void {
 }
 
 pub fn run(self: *App) anyerror!void {
+    try self.logger.printMessage("trying to run the application", .{});
     glfw.glfwWindowHint(glfw.GLFW_DECORATED, glfw.GLFW_FALSE);
     glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MINOR, 3);
 
     self.running = true;
 
+    try self.logger.printMessage("launched window", .{});
     while (!self.renderer.windowShouldClose()) {
         glfw.glfwPollEvents();
         self.renderer.renderFrame();
