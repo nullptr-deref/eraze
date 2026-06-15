@@ -2,7 +2,7 @@
     .name = .eraze,
     .version = "0.0.0",
     .fingerprint = 0xf7dbc28b51d51cd4, // Changing this has security and trust implications.
-    .minimum_zig_version = "0.14.1",
+    .minimum_zig_version = "0.16.0",
     .paths = .{
         "build.zig",
         "build.zig.zon",
@@ -16,3 +16,5 @@
         },
     },
 }
+
+// zon vim:et:ts=4:sw=4:tw=80
