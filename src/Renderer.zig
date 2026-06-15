@@ -37,23 +37,27 @@ pub fn init(
     height: usize,
     title: []const u8,
     allocator: std.mem.Allocator,
+    io: std.Io,
 ) !Renderer {
     glfw.glfwWindowHint(glfw.GLFW_DECORATED, glfw.GLFW_FALSE);
     glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MINOR, 3);
 
     glfwInit() catch {
-        const logger = Logger.init;
-        var desc: [][:0]const u8 = undefined;
-        _ = glfw.glfwGetError(@ptrCast(&desc));
-        try logger.printError("{s}\n", .{desc});
+        var logger = Logger{ .io = io };
+        var desc: [*c]const u8 = undefined;
+        _ = glfw.glfwGetError(&desc);
+        if (desc) |msg| {
+            try logger.printError("{s}\n", .{std.mem.sliceTo(msg, 0)});
+        }
         std.process.exit(127);
     };
 
     const context = try Context.init(width, height, title);
     swapInterval(1);
     glfw.glfwMakeContextCurrent(context.native_handle);
-    try gl.binding.load(getProcAddress);
+    const proc: glfw.GLFWglproc = undefined;
+    try gl.loadExtensions(proc, getProcAddress);
 
     gl.enable(gl.Capabilities.blend);
     gl.blendFunc(
@@ -67,11 +71,7 @@ pub fn init(
     };
 }
 
-pub fn getProcAddress(pname: [:0]const u8) ?*const anyopaque {
-    return glfw.glfwGetProcAddress(pname);
-}
-
-pub fn registerTarget(self: *Renderer, tgt: RenderTarget) void {
+pub fn registerTarget(self: *Renderer, tgt: RenderTarget) !void {
     try self.targets.append(self.allocator, tgt);
 }
 
@@ -134,4 +134,12 @@ pub const RenderTarget = struct {
     primitive_type: gl.PrimitiveType,
 };
 
-//zig vim:et:ts=4:sw=4:tw=80
+pub fn getProcAddress(
+    p: glfw.GLFWglproc,
+    pname: [:0]const u8
+) ?gl.binding.FunctionPointer {
+    _ = p;
+    return glfw.glfwGetProcAddress(pname);
+}
+
+// zig vim:et:ts=4:sw=4:tw=80
