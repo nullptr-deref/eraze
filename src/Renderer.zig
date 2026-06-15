@@ -106,9 +106,8 @@ pub fn setCurrentContext(self: *Renderer, ctx: *Context) void {
 }
 
 pub fn deinit(self: *Renderer) void {
-    self.targets.deinit();
-    self.context.deinit();
     self.targets.deinit(self.allocator);
+    self.context.deinit();
     glfw.glfwTerminate();
 }
 

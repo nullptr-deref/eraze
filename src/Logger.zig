@@ -27,3 +27,5 @@ pub fn printToFile(self: *Logger,
     try writer.print(newlined_fmt, ins);
     try writer.flush();
 }
+
+// zig vim:et:ts=4:sw=4:tw=80

@@ -5,6 +5,7 @@ const glsl = @import("glsl.zig");
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 
 const Renderer = @import("Renderer.zig");
+const Logger = @import("Logger.zig");
 
 const App = @This();
 
@@ -23,7 +24,7 @@ pub fn init(
 ) !App {
     return App{
         .running = true,
-        .renderer = try Renderer.init(width, height, title, allocator),
+        .renderer = try Renderer.init(width, height, title, allocator, io),
         .logger = .{ .io = io },
         .allocator = allocator,
         .io = io,
@@ -31,7 +32,6 @@ pub fn init(
 }
 
 pub fn deinit(self: *App) void {
-    self.renderer.deinit();
     self.running = false;
     self.renderer.deinit();
 }
