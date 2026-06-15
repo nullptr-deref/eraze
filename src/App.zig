@@ -12,11 +12,13 @@ running: bool,
 renderer: Renderer,
 logger: Logger,
 allocator: std.mem.Allocator,
+io: std.Io,
 
-pub fn init(width: usize,
+pub fn init(
+    io: std.Io,
+    width: usize,
     height: usize,
     title: []const u8,
-    io: std.Io,
     allocator: std.mem.Allocator,
 ) !App {
     return App{
@@ -24,6 +26,7 @@ pub fn init(width: usize,
         .renderer = try Renderer.init(width, height, title, allocator),
         .logger = .{ .io = io },
         .allocator = allocator,
+        .io = io,
     };
 }
 
@@ -54,6 +57,7 @@ pub fn run(self: *App) anyerror!void {
 
     const vshader = gl.createShader(gl.ShaderType.vertex);
     const vertex_shader_source = try glsl.readShaderFromFile(
+        self.io,
         self.allocator,
         "resources/vertex.glsl",
     );
@@ -67,6 +71,7 @@ pub fn run(self: *App) anyerror!void {
 
     const fshader = gl.Shader.create(gl.ShaderType.fragment);
     const fragment_shader_source = try glsl.readShaderFromFile(
+        self.io,
         self.allocator,
         "resources/fragment.glsl",
     );
@@ -95,7 +100,12 @@ pub fn run(self: *App) anyerror!void {
     };
     brick.vbo.buffer.bind(gl.BufferTarget.array_buffer);
     brick.vbo.len = vertices.len;
-    gl.bufferData(gl.BufferTarget.array_buffer, f32, &vertices, gl.BufferUsage.static_draw);
+    gl.bufferData(
+        gl.BufferTarget.array_buffer,
+        f32,
+        &vertices,
+        gl.BufferUsage.static_draw,
+    );
 
     gl.vertexAttribPointer(0, 2, gl.Type.float, true, 2 * @sizeOf(f32), 0);
     gl.enableVertexAttribArray(0);
@@ -112,4 +122,4 @@ pub fn run(self: *App) anyerror!void {
     }
 }
 
-//zig vim:et:ts=4:sw=4:tw=80
+// zig vim:et:ts=4:sw=4:tw=80
