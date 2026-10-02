@@ -11,8 +11,8 @@
     },
     .dependencies = .{
         .zgl = .{
-            .url = "https://github.com/ziglibs/zgl/archive/a73479a8036ebf806759f8dd7e6d60abc631da1d.tar.gz",
-            .hash = "zgl-1.1.0-p_NpAD9FCgAY_XDO_EXxSGJ5-n9b3deO0V-9z9HJKYTQ",
+            .url = "git+https://codeberg.org/t_rg/zgl.git#3aadcb232f64b5bf58c41cb3c3d6a366a4cccf21",
+            .hash = "zgl-1.1.0-lVDGbRqwbQDE9FDuNrzXKOsoTFdSfAtjOmyRpN3XtsbR",
         },
     },
 }
